@@ -1,0 +1,1 @@
+export default function GenerationProgress({stage}:{stage:string}){return <div className="progress"><div className="spinner"/><strong>{stage}</strong><p className="muted">Your reference stays private while the design set is prepared.</p></div>}
