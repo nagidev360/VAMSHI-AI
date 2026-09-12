@@ -1,0 +1,6 @@
+import { NextResponse } from 'next/server';
+import { inspectImage, buildFallbackAnalysis } from '@/lib/image-analysis';
+import { analyzeWithCerebras } from '@/lib/cerebras';
+import { MAX_IMAGE_BYTES } from '@/lib/validation';
+export const runtime='nodejs';
+export async function POST(req:Request){try{const form=await req.formData();const file=form.get('image');if(!(file instanceof File))return NextResponse.json({error:'Reference image is required.'},{status:400});if(file.size>MAX_IMAGE_BYTES)return NextResponse.json({error:'Image is too large. Maximum size is 8 MB.'},{status:413});if(!['image/jpeg','image/png','image/webp'].includes(file.type))return NextResponse.json({error:'Unsupported image type.'},{status:415});const buffer=Buffer.from(await file.arrayBuffer());const meta=await inspectImage(buffer);const options={mode:String(form.get('mode')||'Modern'),color:String(form.get('color')||'Original Colors'),repeat:String(form.get('repeat')||'Seamless Repeat')};const base=buildFallbackAnalysis(meta);const ai=await analyzeWithCerebras(base,options);return NextResponse.json({analysis:ai||base});}catch(e){console.error(e);return NextResponse.json({error:'We could not analyze this image. Please try another reference.'},{status:500});}}
