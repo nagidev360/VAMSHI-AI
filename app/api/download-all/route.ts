@@ -1,0 +1,5 @@
+import { NextResponse } from 'next/server';
+import archiver from 'archiver';
+import { Readable } from 'stream';
+export const runtime='nodejs';
+export async function POST(req:Request){try{const {images}=await req.json();if(!Array.isArray(images)||images.length!==6)return NextResponse.json({error:'Exactly six images are required.'},{status:400});const chunks:Buffer[]=[];const archive=archiver('zip');archive.on('data',(c:Buffer)=>chunks.push(c));const done=new Promise<void>((resolve,reject)=>{archive.on('end',()=>resolve());archive.on('error',reject)});images.forEach((src:string,i:number)=>{const b64=src.includes(',')?src.split(',')[1]:'';if(b64)archive.append(Buffer.from(b64,'base64'),{name:`textile-design-${i+1}.png`});});archive.finalize();await done;return new NextResponse(Buffer.concat(chunks),{headers:{'Content-Type':'application/zip','Content-Disposition':'attachment; filename="textile-designs-6.zip"'}});}catch(e){console.error(e);return NextResponse.json({error:'Could not create ZIP.'},{status:500});}}
