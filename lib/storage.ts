@@ -1,0 +1,4 @@
+import { S3Client,PutObjectCommand,DeleteObjectCommand } from '@aws-sdk/client-s3';
+const client=process.env.STORAGE_ENDPOINT&&process.env.STORAGE_ACCESS_KEY&&process.env.STORAGE_SECRET_KEY?new S3Client({region:'auto',endpoint:process.env.STORAGE_ENDPOINT,credentials:{accessKeyId:process.env.STORAGE_ACCESS_KEY,secretAccessKey:process.env.STORAGE_SECRET_KEY}}):null;
+export async function uploadTemporary(key:string,body:Buffer,contentType:string){if(!client||!process.env.STORAGE_BUCKET)throw new Error('Object storage is not configured.');await client.send(new PutObjectCommand({Bucket:process.env.STORAGE_BUCKET,Key:key,Body:body,ContentType:contentType}));return key;}
+export async function deleteTemporary(key:string){if(client&&process.env.STORAGE_BUCKET)await client.send(new DeleteObjectCommand({Bucket:process.env.STORAGE_BUCKET,Key:key}));}
