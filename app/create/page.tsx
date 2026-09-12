@@ -1,0 +1,2 @@
+import CreateStudio from '@/components/CreateStudio';
+export default function CreatePage(){return <main className="create-page"><div className="create-title"><div><span className="eyebrow">Textile design studio</span><h1>Create a new design family.</h1><p className="muted">Upload one reference. We handle the visual direction automatically.</p></div><span className="eyebrow">6 variations / generation</span></div><CreateStudio/></main>}
